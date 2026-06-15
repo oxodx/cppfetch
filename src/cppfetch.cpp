@@ -55,7 +55,7 @@ auto main(int argc, char **argv) -> int {
       std::println("-na, --no-art | Display without the art.");
       std::println("-v, --version | Display package version.");
     } else if (arg == "--version" || arg == "-v") {
-      std::println("CppFetch v0.1.1");
+      std::println("CppFetch {}", VERSION);
       return 0;
     } else if (arg == "--no-art" || arg == "-na") {
       show_art = false;

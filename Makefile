@@ -1,6 +1,7 @@
 CXX ?= clang++
 BIN ?= /usr/local/bin
-CXXFLAGS ?= -Wall -Wextra -I./src -std=c++26 -g
+VERSION ?= $(shell git describe --tags --dirty 2>/dev/null || echo "unknown")
+CXXFLAGS ?= -Wall -Wextra -I./src -std=c++26 -g -DVERSION=\"$(VERSION)\"
 
 all: build
 
