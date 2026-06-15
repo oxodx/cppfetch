@@ -1,0 +1,30 @@
+name: AUR Update
+
+run-name: AUR package update by ${{ github.actor }} release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "aur"
+  cancel-in-progress: true
+
+jobs:
+  aur-update-git:
+    environment:
+      name: aur-packages
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
+    steps:
+      - name: AUR Update
+        uses: ./github/actions/aur
+        with:
+          aur_key: ${{ secrets.AUR_KEY }}
+          username: oxod
+          email: git@oxod.nl
