@@ -197,20 +197,20 @@ auto main(int argc, char** argv) -> int {
 
   line(0, "", std::format("{}@{}", getUsername(), getHostname()));
   line(1, "", makeSeparator());
-  line(2, "OS:", getOS());
-  line(3, "Kernel:", getKernel());
-  line(4, "Uptime:", getUptime());
-  line(5, "Packages:", getPackages());
-  line(6, "CPU:", getCPU());
-  line(7, "GPU:", getGPU()[0]);
-  line(8, "DE:", getDE());
-  line(9, "Terminal:", getTerminal());
-  line(10, "Shell:", getShell());
-  line(11, "RAM:", getRAM());
-  line(12, "Swap:", getSwap());
-  line(13, "Root:", getRootStorage());
+  line(2, "OS: ", getOS());
+  line(3, "Kernel: ", getKernel());
+  line(4, "Uptime: ", getUptime());
+  line(5, "Packages: ", getPackages());
+  line(6, "CPU: ", getCPU());
+  line(7, "GPU: ", getGPU()[0]);
+  line(8, "DE: ", getDE());
+  line(9, "Terminal: ", getTerminal());
+  line(10, "Shell: ", getShell());
+  line(11, "RAM: ", getRAM());
+  line(12, "Swap: ", getSwap());
+  line(13, "Root: ", getRootStorage());
   line(14, "", makeSeparator());
-  line(14, "", getLocalIP());
+  line(14, "IP: ", getLocalIP());
 
   return found ? 0 : 1;
 }
