@@ -43,15 +43,26 @@ void print_uptime(const uptime_info &u) {
 }
 
 auto main(int argc, char **argv) -> int {
+  std::string_view art_name = "";
+
+  for (int i = 1; i < argc; i++) {
+    std::string arg = argv[i];
+
+    if (arg == "--version" || arg == "-v") {
+      std::println("CppFetch v0.1.1");
+    } else {
+      art_name = arg;
+    }
+  }
+
   auto entry = &arts[0];
   bool found = true;
 
   if (argc > 1) [[unlikely]] {
     found = false;
-    std::string_view name = argv[1];
     for (auto it = arts.begin(); it != arts.end(); ++it) {
       const auto &[n, _] = *it;
-      if (n == name) [[unlikely]] {
+      if (n == art_name) [[unlikely]] {
         entry = &*it;
         found = true;
         break;
