@@ -1,11 +1,9 @@
 #include "cppfetch.hpp"
 #include <sys/utsname.h>
 #include <unistd.h>
-#include <cerrno>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
-#include <expected>
 #include <fstream>
 #include <memory>
 #include <print>
@@ -66,50 +64,6 @@ auto get_field_eq(const std::string& content, const std::string& key)
 auto get_field_colon(const std::string& content, const std::string& key)
     -> std::string {
   return get_field_delim(content, key, ':');
-}
-
-auto get_packages() -> std::string {
-  auto pacman = exec("pacman -Q 2>/dev/null | wc -l");
-  auto result = std::string{};
-  if (!pacman.empty() && pacman != "0") {
-    result += pacman + " (pacman)";
-  }
-  auto flatpak = exec("flatpak list 2>/dev/null | wc -l");
-  if (!flatpak.empty() && flatpak != "0") {
-    if (!result.empty()) result += ", ";
-    result += flatpak + " (flatpak)";
-  }
-  if (result.empty()) return "unknown";
-  return result;
-}
-
-auto get_de_wm() -> std::string {
-  auto de = std::getenv("XDG_CURRENT_DESKTOP");
-  if (de) {
-    auto mode = std::getenv("XDG_SESSION_TYPE");
-    if (mode) return std::string(de) + " (" + mode + ")";
-    return de;
-  }
-  auto session = std::getenv("DESKTOP_SESSION");
-  if (session) return session;
-  auto wl = std::getenv("WAYLAND_DISPLAY");
-  if (wl) return "Wayland";
-  return "unknown";
-}
-
-auto get_terminal() -> std::string {
-  auto term_prog = std::getenv("TERM_PROGRAM");
-  if (term_prog) return term_prog;
-  auto term_env = std::getenv("TERM");
-  if (term_env) {
-    auto sv = std::string_view(term_env);
-    if (sv == "xterm-256color" || sv == "xterm") {
-      auto desktop = std::getenv("XDG_SESSION_TYPE");
-      if (desktop && std::string_view(desktop) == "wayland") return "foot";
-    }
-    return std::string(term_env);
-  }
-  return "unknown";
 }
 
 auto is_wide_cjk(char32_t cp) -> bool {
