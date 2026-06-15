@@ -1,7 +1,6 @@
-CXX=clang++
-BIN=/usr/local/bin
-CXXFLAGS=-Wall -Wextra -I./src -std=c++26 -g
-.PHONY: install uninstall
+CXX ?= clang++
+BIN ?= /usr/local/bin
+CXXFLAGS ?= -Wall -Wextra -I./src -std=c++26 -g
 
 all: build
 
@@ -15,3 +14,5 @@ install: build
 
 uninstall:
 	@rm -rf ${BIN}/cppfetch
+
+.PHONY: install uninstall
