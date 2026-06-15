@@ -16,7 +16,4 @@ install: build
 uninstall:
 	@rm -rf ${BIN}/cppfetch
 
-compiledb:
-	@bear -- make build
-
-.PHONY: install uninstall compiledb
+.PHONY: install uninstall
