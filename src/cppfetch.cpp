@@ -49,7 +49,12 @@ auto main(int argc, char **argv) -> int {
   for (int i = 1; i < argc; i++) {
     std::string arg = argv[i];
 
-    if (arg == "--version" || arg == "-v") {
+    if (arg == "--help" || arg == "-h") {
+      std::println("CppFetch - A system fetch tool made in cpp\n");
+      std::println("Argument list:\n");
+      std::println("-na, --no-art | Display without the art.");
+      std::println("-v, --version | Display package version.");
+    } else if (arg == "--version" || arg == "-v") {
       std::println("CppFetch v0.1.1");
       return 0;
     } else if (arg == "--no-art" || arg == "-na") {

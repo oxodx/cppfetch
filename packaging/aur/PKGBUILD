@@ -1,6 +1,6 @@
 # This PKGBUILD is not a full PKGBUILD
 # pkgname, pkgver, source, and sha1sums are to be generated
-pkgdesc="A cmd fetch tool made in cpp"
+pkgdesc="A system fetch tool made in cpp"
 pkgrel=0
 arch=(x86_64)
 license=(MIT)
