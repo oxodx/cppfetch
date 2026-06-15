@@ -235,11 +235,11 @@ auto main(int argc, char** argv) -> int {
   line(2, "OS:", getOS());
   line(3, "Kernel:", getKernel());
   line(4, "Uptime:", getUptime());
-  line(5, "Packages:", get_packages());
+  line(5, "Packages:", getPackages());
   line(6, "CPU:", getCPU());
   line(7, "GPU:", getGPU()[0]);
-  line(8, "DE/WM:", get_de_wm());
-  line(9, "Terminal:", get_terminal());
+  line(8, "DE:", getDE());
+  line(9, "Terminal:", getTerminal());
   line(10, "Shell:", getShell());
   line(11, "RAM:", getRAM());
   line(12, "Swap:", getSwap());
