@@ -20,6 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Generate PKGBUILD
+        env:
+          RELEASE_TAG: ${{ needs.create_release.outputs.release_tag }}
+        run: ./.github/workflows/scripts/generate-pkgbuild.py
       - name: AUR Update
         uses: ./.github/actions/aur
         with:
