@@ -11,7 +11,7 @@ inputs:
   ref:
     description: "Checkout refrence"
     required: false
-    default: 'master'
+    default: 'main'
   username:
     description: "Git username to use"
     required: false
