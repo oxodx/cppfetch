@@ -188,7 +188,7 @@ auto main(int argc, char** argv) -> int {
       prefix.assign(pad, ' ');
     }
     if (label.empty()) {
-      std::println("{}{}{}{}", prefix, colors[color], value, colors["reset"]);
+      std::println("{}{} {}{}", prefix, colors[color], value, colors["reset"]);
     } else {
       std::println("{}{} {}{:<10}{}", prefix, colors[color], label, value,
                    colors["reset"]);
