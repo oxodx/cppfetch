@@ -59,6 +59,12 @@ runs:
       with:
         repository: ${{ inputs.repo }}
         ref: ${{ inputs.ref }}
+    - name: "Pull AUR repos"
+      if: ${{ github.event_name == 'release' }}
+      env:
+        aur_folder: ${{ inputs.aur_folder }}
+      run: ./.github/actions/aur/scripts/aur_pull.sh
+      shell: bash
     - name: "Update PKGBUILDs and .SRCINFOs"
       if: ${{ github.event_name == 'release' }}
       env:
