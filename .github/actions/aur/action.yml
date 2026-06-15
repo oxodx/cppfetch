@@ -1,88 +1,61 @@
-name: "AUR"
-author: "oxodx"
-description: "Updates AUR packages on release"
+name: 'Publish AUR package'
+description: 'Publish an AUR package'
+author: oxodx
 branding:
-  icon: package
   color: purple
+  icon: package
 inputs:
-  aur_key:
-    description: "AUR ssh private key"
+  pkgname:
+    description: 'AUR package name'
     required: true
-  ref:
-    description: "Checkout refrence"
+  pkgbuild:
+    description: 'Path to PKGBUILD file'
+    required: true
+  assets:
+    description: 'Newline-separated glob patterns for additional files to be added to the AUR repository'
     required: false
-    default: 'main'
-  username:
-    description: "Git username to use"
+    default: ''
+  updpkgsums:
+    description: 'Update checksums using `updpkgsums`'
     required: false
-    default: ${{ github.actor || 'github-actions-bot' }}
-  email:
-    description: "Git email to use"
+    default: 'false'
+  test:
+    description: 'Check that PKGBUILD could be built'
     required: false
-    default: github-actions-bot@noreply.com
-  repo:
-    description: "Repository"
+    default: 'false'
+  test_flags:
+    description: 'Command line flags for makepkg to build the package (if `test` is enabled)'
     required: false
-    default: ${{ github.repository }}
-  repo_name:
-    description: "Repository name"
+    default: '--clean --cleanbuild --nodeps'
+  post_process:
+    description: 'A line of commands to execute after processing the package'
     required: false
-    default: ${{ github.repository.name }}
-  aur_folder:
-    description: "AUR files folder"
+    default: ''
+  commit_username:
+    description: 'The username to use when creating the new commit'
+    required: true
+  commit_email:
+    description: 'The email to use when creating the new commit'
+    required: true
+  ssh_private_key:
+    description: 'Your private key with access to AUR package.'
+    required: true
+  commit_message:
+    description: 'Commit message to use when creating the new commit'
     required: false
-    default: "./packaging/aur"
-  tag_name:
-    description: "Release tag name"
+    default: 'Update PKGBUILD and .SRCINFO with GitHub Actions'
+  allow_empty_commits:
+    description: 'Allow empty commits, i.e. commits with no change.'
     required: false
-    default: ${{ github.event.release.tag_name || 'no-tag' }}
+    default: 'false'
+  force_push:
+    description: 'Use --force when push to the AUR.'
+    required: false
+    default: 'false'
+  ssh_keyscan_types:
+    description: 'Comma-separated list of types to use when adding aur.archlinux.org to known hosts'
+    required: false
+    default: 'rsa,ecdsa,ed25519'
 runs:
-  using: "composite"
-  steps:
-    - name: "Setup Runtime"
-      if: ${{ github.event_name == 'release' }}
-      env:
-        aur_key: ${{ inputs.aur_key }}
-      run: ./.github/actions/aur/scripts/setup.sh
-      shell: bash
-    - name: "Configure Git Credentials"
-      if: ${{ github.event_name == 'release' }}
-      env:
-        username: ${{ inputs.username }}
-        email: ${{ inputs.email }}
-        repo_name: ${{ inputs.repo_name }}
-      run: ./.github/actions/aur/scripts/git_config.sh
-      shell: bash
-    - name: "Checkout"
-      if: ${{ github.event_name == 'release' }}
-      uses: actions/checkout@v3
-      with:
-        repository: ${{ inputs.repo }}
-        ref: ${{ inputs.ref }}
-    - name: "Pull AUR repos"
-      if: ${{ github.event_name == 'release' }}
-      env:
-        aur_folder: ${{ inputs.aur_folder }}
-      run: ./.github/actions/aur/scripts/aur_pull.sh
-      shell: bash
-    - name: "Update PKGBUILDs and .SRCINFOs"
-      if: ${{ github.event_name == 'release' }}
-      env:
-        aur_folder: ${{ inputs.aur_folder }}
-        tag_name: ${{ inputs.tag_name }}
-      run: ./.github/actions/aur/scripts/aur_update.sh
-      shell: bash
-    - name: "Push to AUR"
-      if: ${{ github.event_name == 'release' }}
-      env:
-        aur_folder: ${{ inputs.aur_folder }}
-        tag_name: ${{ inputs.tag_name }}
-      run: ./.github/actions/aur/scripts/aur_push.sh
-      shell: bash
-    - name: "Push to AUR"
-      if: ${{ github.event_name == 'release' }}
-      env:
-        aur_folder: ${{ inputs.aur_folder }}
-        tag_name: ${{ inputs.tag_name }}
-      run: ./.github/actions/aur/scripts/repo_push.sh
-      shell: bash
+  using: 'docker'
+  image: 'Dockerfile'

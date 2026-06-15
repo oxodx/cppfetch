@@ -18,15 +18,15 @@ jobs:
     environment:
       name: aur-packages
     runs-on: ubuntu-latest
-    container:
-      image: archlinux
-      options: --privileged
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: AUR Update
         uses: ./.github/actions/aur
         with:
-          aur_key: ${{ secrets.AUR_KEY }}
-          username: oxod
-          email: git@oxod.nl
+          pkgname: cppfetch
+          pkgbuild: ./packaging/aur/PKGBUILD
+          commit_username: oxod
+          commit_email: git@oxod.nl
+          ssh_private_key: ${{ secrets.AUR_KEY }}
+          commit_message: Update AUR package
+          ssh_keyscan_types: rsa,ecdsa,ed25519
