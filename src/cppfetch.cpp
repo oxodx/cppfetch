@@ -222,6 +222,71 @@ auto get_root() -> std::string {
   return out;
 }
 
+auto is_wide_cjk(char32_t cp) -> bool {
+  return (cp >= 0x1100 && cp <= 0x115F) ||
+         (cp >= 0x2E80 && cp <= 0x303E) ||
+         (cp >= 0x3040 && cp <= 0x309F) ||
+         (cp >= 0x30A0 && cp <= 0x30FF) ||
+         (cp >= 0x3400 && cp <= 0x4DBF) ||
+         (cp >= 0x4E00 && cp <= 0x9FFF) ||
+         (cp >= 0xAC00 && cp <= 0xD7AF) ||
+         (cp >= 0xF900 && cp <= 0xFAFF) ||
+         (cp >= 0xFE10 && cp <= 0xFE1F) ||
+         (cp >= 0xFE30 && cp <= 0xFE4F) ||
+         (cp >= 0xFF01 && cp <= 0xFF60) ||
+         (cp >= 0xFFE0 && cp <= 0xFFE6) ||
+         (cp >= 0x1B000 && cp <= 0x1B0FF) ||
+         (cp >= 0x1B100 && cp <= 0x1B12F) ||
+         (cp >= 0x20000 && cp <= 0x2A6DF) ||
+         (cp >= 0x2A700 && cp <= 0x2B73F) ||
+         (cp >= 0x2B740 && cp <= 0x2B81F) ||
+         (cp >= 0x2F800 && cp <= 0x2FA1F);
+}
+
+auto utf8_decode(const unsigned char*& s) -> char32_t {
+  if (s[0] < 0x80) {
+    auto cp = s[0];
+    s++;
+    return cp;
+  }
+  if ((s[0] & 0xE0) == 0xC0) {
+    auto cp = static_cast<char32_t>(s[0] & 0x1F) << 6;
+    cp |= s[1] & 0x3F;
+    s += 2;
+    return cp;
+  }
+  if ((s[0] & 0xF0) == 0xE0) {
+    auto cp = static_cast<char32_t>(s[0] & 0x0F) << 12;
+    cp |= static_cast<char32_t>(s[1] & 0x3F) << 6;
+    cp |= s[2] & 0x3F;
+    s += 3;
+    return cp;
+  }
+  auto cp = static_cast<char32_t>(s[0] & 0x07) << 18;
+  cp |= static_cast<char32_t>(s[1] & 0x3F) << 12;
+  cp |= static_cast<char32_t>(s[2] & 0x3F) << 6;
+  cp |= s[3] & 0x3F;
+  s += 4;
+  return cp;
+}
+
+auto visible_width(std::string_view s) -> size_t {
+  size_t w = 0;
+  for (size_t i = 0; i < s.size();) {
+    if (s[i] == '\033') {
+      while (i < s.size() && s[i] != 'm') i++;
+      if (i < s.size()) i++;
+      continue;
+    }
+    auto ptr = reinterpret_cast<const unsigned char*>(s.data()) + i;
+    auto cp = utf8_decode(ptr);
+    auto consumed = ptr - (reinterpret_cast<const unsigned char*>(s.data()) + i);
+    i += consumed;
+    w += is_wide_cjk(cp) ? 2 : 1;
+  }
+  return w;
+}
+
 auto main(int argc, char** argv) -> int {
   std::string_view art_name = "";
   bool show_art = true;
@@ -268,15 +333,26 @@ auto main(int argc, char** argv) -> int {
   gethostname(hostname, sizeof(hostname));
   uname(&uname_buf);
 
+  size_t pad = 0;
+  if (show_art) {
+    for (auto& line : entry->art) {
+      pad = std::max(pad, visible_width(line));
+    }
+  }
+
   auto line = [&](size_t i, std::string_view label, const std::string& value) {
     auto prefix = std::string{};
     if (show_art && i < entry->art.size()) {
       prefix = entry->art[i];
+      auto w = visible_width(prefix);
+      if (w < pad) prefix.append(pad - w, ' ');
+    } else {
+      prefix.assign(pad, ' ');
     }
     if (label.empty()) {
-      std::println("{:<24}{}", prefix, value);
+      std::println("{}{}", prefix, value);
     } else {
-      std::println("{:<24}{:<10}{}", prefix, label, value);
+      std::println("{}{:<10}{}", prefix, label, value);
     }
   };
 
