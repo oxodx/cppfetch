@@ -43,7 +43,7 @@ runs:
       if: ${{ github.event_name == 'release' }}
       env:
         aur_key: ${{ inputs.aur_key }}
-      run: /__w/_actions/oxodx/cppfetch/main/.github/actions/aur/scripts/setup.sh
+      run: ./.github/actions/aur/scripts/setup.sh
       shell: bash
     - name: "Configure Git Credentials"
       if: ${{ github.event_name == 'release' }}
@@ -51,7 +51,7 @@ runs:
         username: ${{ inputs.username }}
         email: ${{ inputs.email }}
         repo_name: ${{ inputs.repo_name }}
-      run: /__w/_actions/oxodx/cppfetch/main/.github/actions/aur/scripts/git_config.sh
+      run: ./.github/actions/aur/scripts/git_config.sh
       shell: bash
     - name: "Checkout"
       if: ${{ github.event_name == 'release' }}
@@ -64,19 +64,19 @@ runs:
       env:
         aur_folder: ${{ inputs.aur_folder }}
         tag_name: ${{ inputs.tag_name }}
-      run: /__w/_actions/oxodx/cppfetch/main/.github/actions/aur/scripts/aur_update.sh
+      run: ./.github/actions/aur/scripts/aur_update.sh
       shell: bash
     - name: "Push to AUR"
       if: ${{ github.event_name == 'release' }}
       env:
         aur_folder: ${{ inputs.aur_folder }}
         tag_name: ${{ inputs.tag_name }}
-      run: /__w/_actions/oxodx/cppfetch/main/.github/actions/aur/scripts/aur_push.sh
+      run: ./.github/actions/aur/scripts/aur_push.sh
       shell: bash
     - name: "Push to AUR"
       if: ${{ github.event_name == 'release' }}
       env:
         aur_folder: ${{ inputs.aur_folder }}
         tag_name: ${{ inputs.tag_name }}
-      run: /__w/_actions/oxodx/cppfetch/main/.github/actions/aur/scripts/repo_push.sh
+      run: ./.github/actions/aur/scripts/repo_push.sh
       shell: bash
