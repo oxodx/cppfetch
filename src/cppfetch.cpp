@@ -196,7 +196,7 @@ auto main(int argc, char** argv) -> int {
   };
 
   line(0, "", std::format("{}@{}", getUsername(), getHostname()));
-  line(1, "", "---------");
+  line(1, "", makeSeparator());
   line(2, "OS:", getOS());
   line(3, "Kernel:", getKernel());
   line(4, "Uptime:", getUptime());
@@ -209,6 +209,8 @@ auto main(int argc, char** argv) -> int {
   line(11, "RAM:", getRAM());
   line(12, "Swap:", getSwap());
   line(13, "Root:", getRootStorage());
+  line(14, "", makeSeparator());
+  line(14, "", getLocalIP());
 
   return found ? 0 : 1;
 }
