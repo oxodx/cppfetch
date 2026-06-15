@@ -268,13 +268,17 @@ auto main(int argc, char** argv) -> int {
   gethostname(hostname, sizeof(hostname));
   uname(&uname_buf);
 
-  auto art = [&](size_t i) -> std::string_view {
-    if (!show_art || i >= entry->art.size()) return "";
-    return entry->art[i];
+  auto art = [&](size_t i) -> std::string {
+    if (!show_art || i >= entry->art.size()) return std::string(8, ' ');
+    return std::string(entry->art[i]);
   };
 
   auto line = [&](size_t i, std::string_view label, const std::string& value) {
-    std::println("{} {:<10}{}", art(i), label, value);
+    if (label.empty()) {
+      std::println("{}{}", art(i), value);
+    } else {
+      std::println("{}{:<10}{}", art(i), label, value);
+    }
   };
 
   auto uptime_result = get_uptime();

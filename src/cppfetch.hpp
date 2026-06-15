@@ -13,7 +13,7 @@ constexpr std::array arts = {
                   std::string_view{" ╱|、    "},
                   std::string_view{"(˚ˎ。7   "},
                   std::string_view{"| 、˜〵  "},
-                  std::string_view{"じしˍ,)ノ"},
+                  std::string_view{"じしˍ,)ノ "},
               }},
     art_entry{"freebsd",
               std::array{
