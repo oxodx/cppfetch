@@ -8,6 +8,7 @@
 #include <memory>
 #include <print>
 #include <string>
+#include <unordered_map>
 #include "system.hpp"
 
 using namespace std::chrono;
@@ -127,6 +128,15 @@ auto main(int argc, char** argv) -> int {
   std::string_view art_name = "";
   bool show_art = true;
 
+  std::string color = "purple";
+  std::unordered_map<std::string, std::string> colors = {
+      {"black", "\033[1;30m"},    {"red", "\033[1;31m"},
+      {"green", "\033[1;32m"},    {"yellow", "\033[1;33m"},
+      {"blue", "\033[1;34m"},     {"purple", "\033[1;35m"},
+      {"cyan", "\033[1;36m"},     {"white", "\033[1;37m"},
+      {"pink", "\033[38;5;213m"}, {"reset", "\033[0m"},
+  };
+
   for (int i = 1; i < argc; i++) {
     std::string arg = argv[i];
 
@@ -178,9 +188,10 @@ auto main(int argc, char** argv) -> int {
       prefix.assign(pad, ' ');
     }
     if (label.empty()) {
-      std::println("{}{}", prefix, value);
+      std::println("{}{}{}{}", prefix, colors[color], value, colors["reset"]);
     } else {
-      std::println("{}{:<10}{}", prefix, label, value);
+      std::println("{}{} {}{:<10}{}", prefix, colors[color], label, value,
+                   colors["reset"]);
     }
   };
 
