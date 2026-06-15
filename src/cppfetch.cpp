@@ -1,4 +1,6 @@
 #include "cppfetch.hpp"
+#include <sys/utsname.h>
+#include <unistd.h>
 #include <cerrno>
 #include <chrono>
 #include <cstdio>
@@ -8,8 +10,6 @@
 #include <memory>
 #include <print>
 #include <string>
-#include <sys/utsname.h>
-#include <unistd.h>
 
 using namespace std::chrono;
 
@@ -34,7 +34,7 @@ auto get_uptime() -> std::expected<uptime_info, std::errc> {
   };
 }
 
-auto format_uptime(const uptime_info &u) -> std::string {
+auto format_uptime(const uptime_info& u) -> std::string {
   if (u.d == days{0} && u.h == hours{0} && u.m == minutes{0}) {
     return std::format("{}s", u.s.count());
   }
@@ -47,12 +47,11 @@ auto format_uptime(const uptime_info &u) -> std::string {
   return std::format("{}d {}h {}m", u.d.count(), u.h.count(), u.m.count());
 }
 
-auto exec(const char *cmd) -> std::string {
+auto exec(const char* cmd) -> std::string {
   std::array<char, 256> buf{};
   std::string result;
-  auto pipe = std::unique_ptr<FILE, int (*)(FILE *)>(popen(cmd, "r"), pclose);
-  if (!pipe)
-    return {};
+  auto pipe = std::unique_ptr<FILE, int (*)(FILE*)>(popen(cmd, "r"), pclose);
+  if (!pipe) return {};
   while (fgets(buf.data(), buf.size(), pipe.get())) {
     result += buf.data();
   }
@@ -62,21 +61,18 @@ auto exec(const char *cmd) -> std::string {
   return result;
 }
 
-auto read_file(const char *path) -> std::string {
+auto read_file(const char* path) -> std::string {
   std::ifstream f(path);
-  if (!f)
-    return {};
+  if (!f) return {};
   return std::string(std::istreambuf_iterator<char>(f), {});
 }
 
-auto get_field_delim(const std::string &content, const std::string &key,
+auto get_field_delim(const std::string& content, const std::string& key,
                      char delim) -> std::string {
   auto pos = content.find(key);
-  if (pos == std::string::npos)
-    return {};
+  if (pos == std::string::npos) return {};
   pos = content.find(delim, pos);
-  if (pos == std::string::npos)
-    return {};
+  if (pos == std::string::npos) return {};
   pos++;
   auto result = std::string{};
   if (pos < content.size() && (content[pos] == '"' || content[pos] == '\'')) {
@@ -95,26 +91,23 @@ auto get_field_delim(const std::string &content, const std::string &key,
   return result;
 }
 
-auto get_field_eq(const std::string &content, const std::string &key)
+auto get_field_eq(const std::string& content, const std::string& key)
     -> std::string {
   return get_field_delim(content, key, '=');
 }
 
-auto get_field_colon(const std::string &content, const std::string &key)
+auto get_field_colon(const std::string& content, const std::string& key)
     -> std::string {
   return get_field_delim(content, key, ':');
 }
 
 auto get_os() -> std::string {
   auto content = read_file("/etc/os-release");
-  if (content.empty())
-    return "Linux";
+  if (content.empty()) return "Linux";
   auto name = get_field_eq(content, "PRETTY_NAME");
-  if (!name.empty())
-    return name;
+  if (!name.empty()) return name;
   name = get_field_eq(content, "NAME");
-  if (!name.empty())
-    return name;
+  if (!name.empty()) return name;
   return "Linux";
 }
 
@@ -126,44 +119,36 @@ auto get_packages() -> std::string {
   }
   auto flatpak = exec("flatpak list 2>/dev/null | wc -l");
   if (!flatpak.empty() && flatpak != "0") {
-    if (!result.empty())
-      result += ", ";
+    if (!result.empty()) result += ", ";
     result += flatpak + " (flatpak)";
   }
-  if (result.empty())
-    return "unknown";
+  if (result.empty()) return "unknown";
   return result;
 }
 
 auto get_cpu() -> std::string {
   auto content = read_file("/proc/cpuinfo");
   auto model = get_field_colon(content, "model name");
-  if (model.empty())
-    return "unknown";
+  if (model.empty()) return "unknown";
 
   auto pos = model.find("(R)");
-  if (pos != std::string::npos)
-    model.erase(pos, 3);
+  if (pos != std::string::npos) model.erase(pos, 3);
   pos = model.find("(TM)");
-  if (pos != std::string::npos)
-    model.erase(pos, 4);
+  if (pos != std::string::npos) model.erase(pos, 4);
   pos = model.find("CPU");
-  if (pos != std::string::npos)
-    model.erase(pos, 3);
+  if (pos != std::string::npos) model.erase(pos, 3);
 
-  while (!model.empty() && model.back() == ' ')
-    model.pop_back();
-  while (!model.empty() && model[0] == ' ')
-    model.erase(0, 1);
+  while (!model.empty() && model.back() == ' ') model.pop_back();
+  while (!model.empty() && model[0] == ' ') model.erase(0, 1);
 
   return model;
 }
 
 auto get_gpu() -> std::string {
-  auto out = exec("lspci 2>/dev/null | grep -iE 'vga|3d|display' | head -1 | "
-                  "sed 's/.*: //'");
-  if (out.empty())
-    return "unknown";
+  auto out = exec(
+      "lspci 2>/dev/null | grep -iE 'vga|3d|display' | head -1 | "
+      "sed 's/.*: //'");
+  if (out.empty()) return "unknown";
   return out;
 }
 
@@ -171,30 +156,25 @@ auto get_de_wm() -> std::string {
   auto de = std::getenv("XDG_CURRENT_DESKTOP");
   if (de) {
     auto mode = std::getenv("XDG_SESSION_TYPE");
-    if (mode)
-      return std::string(de) + " (" + mode + ")";
+    if (mode) return std::string(de) + " (" + mode + ")";
     return de;
   }
   auto session = std::getenv("DESKTOP_SESSION");
-  if (session)
-    return session;
+  if (session) return session;
   auto wl = std::getenv("WAYLAND_DISPLAY");
-  if (wl)
-    return "Wayland";
+  if (wl) return "Wayland";
   return "unknown";
 }
 
 auto get_terminal() -> std::string {
   auto term_prog = std::getenv("TERM_PROGRAM");
-  if (term_prog)
-    return term_prog;
+  if (term_prog) return term_prog;
   auto term_env = std::getenv("TERM");
   if (term_env) {
     auto sv = std::string_view(term_env);
     if (sv == "xterm-256color" || sv == "xterm") {
       auto desktop = std::getenv("XDG_SESSION_TYPE");
-      if (desktop && std::string_view(desktop) == "wayland")
-        return "foot";
+      if (desktop && std::string_view(desktop) == "wayland") return "foot";
     }
     return std::string(term_env);
   }
@@ -206,18 +186,16 @@ auto get_shell() -> std::string {
   if (shell) {
     auto sv = std::string_view(shell);
     auto pos = sv.rfind('/');
-    if (pos != std::string_view::npos)
-      return std::string(sv.substr(pos + 1));
+    if (pos != std::string_view::npos) return std::string(sv.substr(pos + 1));
     return std::string(sv);
   }
   return "unknown";
 }
 
-auto get_mem_label(const std::string &key) -> std::string {
+auto get_mem_label(const std::string& key) -> std::string {
   auto content = read_file("/proc/meminfo");
   auto total_str = get_field_colon(content, key);
-  if (total_str.empty())
-    return "unknown";
+  if (total_str.empty()) return "unknown";
 
   auto total_kb = std::stoll(total_str);
   auto total_gib = total_kb / (1024.0 * 1024.0);
@@ -240,12 +218,11 @@ auto get_mem_label(const std::string &key) -> std::string {
 auto get_root() -> std::string {
   auto out =
       exec("df -h / 2>/dev/null | awk 'NR==2{print $3\"/\"$2\" (\"$5\")\"}'");
-  if (out.empty())
-    return "unknown";
+  if (out.empty()) return "unknown";
   return out;
 }
 
-auto main(int argc, char **argv) -> int {
+auto main(int argc, char** argv) -> int {
   std::string_view art_name = "";
   bool show_art = true;
 
@@ -274,7 +251,7 @@ auto main(int argc, char **argv) -> int {
   if (argc > 1) [[unlikely]] {
     found = false;
     for (auto it = arts.begin(); it != arts.end(); ++it) {
-      const auto &[n, _] = *it;
+      const auto& [n, _] = *it;
       if (n == art_name) [[unlikely]] {
         entry = &*it;
         found = true;
@@ -292,12 +269,11 @@ auto main(int argc, char **argv) -> int {
   uname(&uname_buf);
 
   auto art = [&](size_t i) -> std::string_view {
-    if (!show_art || i >= entry->art.size())
-      return "";
+    if (!show_art || i >= entry->art.size()) return "";
     return entry->art[i];
   };
 
-  auto line = [&](size_t i, std::string_view label, const std::string &value) {
+  auto line = [&](size_t i, std::string_view label, const std::string& value) {
     std::println("{} {:<10}{}", art(i), label, value);
   };
 
