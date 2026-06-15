@@ -2,6 +2,7 @@
 
 set -eu
 
+git config --global --add safe.directory "$(pwd)"
 if [[ -d ./.not_git ]]; then
   mv ./.not_git ./.git
 fi
