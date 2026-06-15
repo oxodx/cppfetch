@@ -1,6 +1,6 @@
 pkgbase = cppfetch
 	pkgdesc = A cmd fetch tool made in cpp
-	pkgver = 0.1.0
+	pkgver = 0.1.1
 	pkgrel = 1
 	url = https://github.com/oxodx/cppfetch
 	arch = x86_64
