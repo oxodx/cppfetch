@@ -10,6 +10,7 @@
 #include <memory>
 #include <print>
 #include <string>
+#include "system.hpp"
 
 using namespace std::chrono;
 
@@ -223,24 +224,15 @@ auto get_root() -> std::string {
 }
 
 auto is_wide_cjk(char32_t cp) -> bool {
-  return (cp >= 0x1100 && cp <= 0x115F) ||
-         (cp >= 0x2E80 && cp <= 0x303E) ||
-         (cp >= 0x3040 && cp <= 0x309F) ||
-         (cp >= 0x30A0 && cp <= 0x30FF) ||
-         (cp >= 0x3400 && cp <= 0x4DBF) ||
-         (cp >= 0x4E00 && cp <= 0x9FFF) ||
-         (cp >= 0xAC00 && cp <= 0xD7AF) ||
-         (cp >= 0xF900 && cp <= 0xFAFF) ||
-         (cp >= 0xFE10 && cp <= 0xFE1F) ||
-         (cp >= 0xFE30 && cp <= 0xFE4F) ||
-         (cp >= 0xFF01 && cp <= 0xFF60) ||
-         (cp >= 0xFFE0 && cp <= 0xFFE6) ||
-         (cp >= 0x1B000 && cp <= 0x1B0FF) ||
-         (cp >= 0x1B100 && cp <= 0x1B12F) ||
-         (cp >= 0x20000 && cp <= 0x2A6DF) ||
-         (cp >= 0x2A700 && cp <= 0x2B73F) ||
-         (cp >= 0x2B740 && cp <= 0x2B81F) ||
-         (cp >= 0x2F800 && cp <= 0x2FA1F);
+  return (cp >= 0x1100 && cp <= 0x115F) || (cp >= 0x2E80 && cp <= 0x303E) ||
+         (cp >= 0x3040 && cp <= 0x309F) || (cp >= 0x30A0 && cp <= 0x30FF) ||
+         (cp >= 0x3400 && cp <= 0x4DBF) || (cp >= 0x4E00 && cp <= 0x9FFF) ||
+         (cp >= 0xAC00 && cp <= 0xD7AF) || (cp >= 0xF900 && cp <= 0xFAFF) ||
+         (cp >= 0xFE10 && cp <= 0xFE1F) || (cp >= 0xFE30 && cp <= 0xFE4F) ||
+         (cp >= 0xFF01 && cp <= 0xFF60) || (cp >= 0xFFE0 && cp <= 0xFFE6) ||
+         (cp >= 0x1B000 && cp <= 0x1B0FF) || (cp >= 0x1B100 && cp <= 0x1B12F) ||
+         (cp >= 0x20000 && cp <= 0x2A6DF) || (cp >= 0x2A700 && cp <= 0x2B73F) ||
+         (cp >= 0x2B740 && cp <= 0x2B81F) || (cp >= 0x2F800 && cp <= 0x2FA1F);
 }
 
 auto utf8_decode(const unsigned char*& s) -> char32_t {
@@ -280,7 +272,8 @@ auto visible_width(std::string_view s) -> size_t {
     }
     auto ptr = reinterpret_cast<const unsigned char*>(s.data()) + i;
     auto cp = utf8_decode(ptr);
-    auto consumed = ptr - (reinterpret_cast<const unsigned char*>(s.data()) + i);
+    auto consumed =
+        ptr - (reinterpret_cast<const unsigned char*>(s.data()) + i);
     i += consumed;
     w += is_wide_cjk(cp) ? 2 : 1;
   }
@@ -325,12 +318,7 @@ auto main(int argc, char** argv) -> int {
     }
   }
 
-  char username[128]{};
-  char hostname[128]{};
   struct utsname uname_buf{};
-
-  getlogin_r(username, sizeof(username));
-  gethostname(hostname, sizeof(hostname));
   uname(&uname_buf);
 
   size_t pad = 0;
@@ -360,7 +348,7 @@ auto main(int argc, char** argv) -> int {
   auto uptime_str =
       uptime_result ? format_uptime(*uptime_result) : std::string("unknown");
 
-  line(0, "", std::format("{}@{}", username, hostname));
+  line(0, "", std::format("{}@{}", getUsername(), getHostname()));
   line(1, "", "---------");
   line(2, "OS:", get_os());
   line(3,

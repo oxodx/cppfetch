@@ -5,7 +5,7 @@ CXXFLAGS ?= -Wall -Wextra -I./src -std=c++26 -g -DVERSION=\"$(VERSION)\"
 
 all: build
 
-build: ./src/cppfetch.cpp
+build: ./src/cppfetch.cpp ./src/system.cpp
 	@mkdir -p ./bin
 	@$(CXX) -o ./bin/cppfetch $^ $(CXXFLAGS)
 
