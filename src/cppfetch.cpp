@@ -44,12 +44,16 @@ void print_uptime(const uptime_info &u) {
 
 auto main(int argc, char **argv) -> int {
   std::string_view art_name = "";
+  bool show_art = true;
 
   for (int i = 1; i < argc; i++) {
     std::string arg = argv[i];
 
     if (arg == "--version" || arg == "-v") {
       std::println("CppFetch v0.1.1");
+      return 0;
+    } else if (arg == "--no-art" || arg == "-na") {
+      show_art = false;
     } else {
       art_name = arg;
     }
@@ -78,7 +82,15 @@ auto main(int argc, char **argv) -> int {
   gethostname(hostname, sizeof(hostname));
   uname(&uname_buf);
 
-  auto [l0, l1, l2, l3] = entry->art;
+  std::string_view l0 = "", l1 = "", l2 = "", l3 = "";
+  if (show_art) {
+    auto [al0, al1, al2, al3] = entry->art;
+    l0 = al0;
+    l1 = al1;
+    l2 = al2;
+    l3 = al3;
+  }
+
   std::println("{} {}@{}", l0, username, hostname);
   std::println("{} --", l1);
   std::println("{} {} {}", l2, uname_buf.sysname, uname_buf.release);
