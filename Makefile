@@ -6,13 +6,14 @@ CXXFLAGS=-Wall -Wextra -I./src -std=c++26 -g
 all: build install
 
 build: ./src/cppfetch.cpp
-	@$(CXX) -o cppfetch $^ $(CXXFLAGS)
+  mkdir -p ./bin
+	@$(CXX) -o ./bin/cppfetch $^ $(CXXFLAGS)
 
 install:
-	@sudo cp ./cppfetch $(BIN)
+	@sudo cp ./bin/cppfetch $(BIN)
 
 clean:
-	@rm ./cppfetch
+	@rm ./bin/cppfetch
 
 purge: clean
 	@sudo rm $(BIN)/cppfetch
