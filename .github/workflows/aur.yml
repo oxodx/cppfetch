@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Generate PKGBUILD
         env:
-          RELEASE_TAG: ${{ needs.create_release.outputs.release_tag }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: ./.github/workflows/scripts/generate-pkgbuild.py
       - name: AUR Update
         uses: ./.github/actions/aur
